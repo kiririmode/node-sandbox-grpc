@@ -1,6 +1,7 @@
 const path = require("path")
 const grpc = require("grpc")
 const protoLoader = require("@grpc/proto-loader")
+const fs = require("fs")
 
 const PROTO_PATH = path.join(__dirname, "greeter.proto")
 
@@ -14,8 +15,8 @@ try {
     })
     const greeter = grpc.loadPackageDefinition(packageDefinition).Greeter
     const client = new greeter(
-        "localhost:50050",
-        grpc.credentials.createInsecure(),
+        "kiririmode.com:50050",
+        grpc.credentials.createSsl(),
         {
             "grpc.keepalive_time_ms": 1000,
             "grpc.keepalive_timeout_ms": 2000,
@@ -24,18 +25,8 @@ try {
             "grpc.http2.max_pings_without_data": 0
         }
     )
-    const call = client.SayHellos({ name: "kiririmode" })
-    call.on("data", data => {
-        console.log("data: " + JSON.stringify(data))
-    })
-    call.on("end", () => {
-        console.log("end")
-    })
-    call.on("error", e => {
-        console.log(e)
-    })
-    call.on("status", status => {
-        console.log("status: " + JSON.stringify(status))
+    client.SayHello({ name: "kiririmode" }, (err, res) => {
+        console.log(res)
     })
 } catch (ex) {
     console.error(ex)
